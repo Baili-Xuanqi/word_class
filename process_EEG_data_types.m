@@ -35,17 +35,21 @@ function process_EEG_data_types(input_path, output_path)
     
         % 8. 【弹窗】绘制全部通道的 Component maps
         pop_topoplot(EEG, 0);
+
+        % 9. 绘制各成分波形的矩形阵列
+        componentList = 1:size(EEG.icaweights,1);
+        pop_plotdata(EEG, 0, componentList, [], 'Component ERPs', 0, 1, [0 0]);
     
-        % 9. 【弹窗】Remove components from data
+        % 10. 【弹窗】Remove components from data
         EEG = pop_subcomp(EEG);
     
-        % 10. 导出处理好的原始数据 set 格式
+        % 11. 导出处理好的原始数据 set 格式
         % 先保存为 EEGLAB 的 .set 格式
         [~, input_file_name, ~] = fileparts(input_path);
         processed_filename = fullfile(output_path, sprintf('%s_%s_processed.set',input_file_name,event_type{1}));
         pop_saveset(EEG, 'filename', processed_filename);
     
-        % 11. 按所需通道导出 ERP Image 和 Average ERP 原始数据
+        % 12. 按所需通道导出 ERP Image 和 Average ERP 原始数据
         channels_to_plot = [9, 10, 11, 27, 28, 29, 45, 46, 47]; % 需要绘制的通道索引列表
         % 9-F1, 10-FZ, 11-F2; 27-C1, 28-CZ, 29-C2; 45-P1, 46-PZ, 47-P2
         for i = 1:length(channels_to_plot)
