@@ -12,7 +12,7 @@ function process_EEG_data_types(input_path, output_path)
         EEG = pop_select(EEG, 'channel', setdiff(1:size(EEG.data, 1), channel_to_remove));
     
         % 3. 使用 FIR 滤波器，1~30 Hz
-        EEG = pop_eegfiltnew(EEG, 'locutoff', 1, 'hicutoff', 30);
+        EEG = pop_eegfiltnew(EEG, 'locutoff', 5, 'hicutoff', 30);
     
         % 4. 设置 time-locking event, epoch limits = [0, 1]，提取事件
         epoch_limits = [-0.1 1]; % 时间范围 0 到 1 秒
@@ -24,7 +24,7 @@ function process_EEG_data_types(input_path, output_path)
         EEG = pop_epoch(EEG, event_type, epoch_limits);
     
         % 5. 对整个 epoch 做基线矫正
-        baseline_range = [-0.1 0]; % 基线时间范围，[]=全部
+        baseline_range = [-100 0]; % 基线时间范围，[]=全部
         EEG = pop_rmbase(EEG, baseline_range);
     
         % 6. 用 extended-runica 算法完成 ICA
@@ -50,8 +50,8 @@ function process_EEG_data_types(input_path, output_path)
         pop_saveset(EEG, 'filename', processed_filename);
     
         % 12. 按所需通道导出 ERP Image 和 Average ERP 原始数据
-        channels_to_plot = [9, 10, 11, 27, 28, 29, 45, 46, 47]; % 需要绘制的通道索引列表
-        % 9-F1, 10-FZ, 11-F2; 27-C1, 28-CZ, 29-C2; 45-P1, 46-PZ, 47-P2
+        channels_to_plot = []; % 需要绘制的通道索引列表
+        % 
         for i = 1:length(channels_to_plot)
             channel_index = channels_to_plot(i);
             
