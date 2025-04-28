@@ -11,11 +11,11 @@ function process_EEG_data_types(input_path, output_path)
         channel_to_remove = [33,43,65:69]; % 需要移除的通道编号，33 - M1，43 - M2
         EEG = pop_select(EEG, 'channel', setdiff(1:size(EEG.data, 1), channel_to_remove));
     
-        % 3. 使用 FIR 滤波器，1~30 Hz
+        % 3. 使用 FIR 滤波器，5~30 Hz
         EEG = pop_eegfiltnew(EEG, 'locutoff', 5, 'hicutoff', 30);
     
         % 4. 设置 time-locking event, epoch limits = [0, 1]，提取事件
-        epoch_limits = [-0.1 1]; % 时间范围 0 到 1 秒
+        epoch_limits = [-0.1 1]; % 时间范围 -0.1 到 1 秒
         all_types = {'1','2','3','4'};
     
         event_type={};
@@ -24,7 +24,7 @@ function process_EEG_data_types(input_path, output_path)
         EEG = pop_epoch(EEG, event_type, epoch_limits);
     
         % 5. 对整个 epoch 做基线矫正
-        baseline_range = [-100 0]; % 基线时间范围，[]=全部
+        baseline_range = [-100 0]; % 基线时间范围（ms），[]=全部
         EEG = pop_rmbase(EEG, baseline_range);
     
         % 6. 用 extended-runica 算法完成 ICA
