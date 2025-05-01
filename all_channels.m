@@ -6,9 +6,11 @@ clear;
 
 eeglab;
 
+DATA_DIR = 'huanglei-m-250401';
+
 % 设置路径和参数
-dataFolder = 'D:\python\mne\250331-1'; % 数据文件夹路径
-outputFolder = 'D:\python\mne\250331-1\250331-1-plots';    % 输出文件夹路径
+dataFolder = ['D:\SHU\Senior\Courses\Bishe\processed\' DATA_DIR]; % 数据文件夹路径
+outputFolder = ['D:\SHU\Senior\Courses\Bishe\processed\' DATA_DIR '\plots'];    % 输出文件夹路径
 
 % 确保输出文件夹存在
 if ~exist(outputFolder, 'dir')
@@ -17,7 +19,9 @@ end
 
 % 定义匹配模式
 filePattern = fullfile(dataFolder, '*_processed.set'); % 匹配 .set 文件
+fdtPattern = fullfile(dataFolder, '*_processed.fdt'); % 
 dataFiles = dir(filePattern); % 获取所有符合条件的 .set 文件
+fdtFiles = dir(fdtPattern); % 
 
 % 遍历每个 .set 文件
 for i = 1:length(dataFiles)
@@ -32,7 +36,14 @@ for i = 1:length(dataFiles)
     
     % 加载 .set 文件
     setFilePath = fullfile(dataFiles(i).folder, dataFiles(i).name);
-    EEG = pop_loadset(setFilePath); % 加载 EEG 数据
+    EEG = pop_loadset('filename', setFilePath, 'loadmode', 'info');
+    
+    % 更新 .fdt 文件信息
+    [~, fdt_name, fdt_ext] = fileparts(fdtFiles(i).name);
+    EEG.data = [fdt_name, fdt_ext];
+    
+    EEG = eeg_checkset(EEG, 'loaddata'); % 加载实际数据矩阵
+    
     
     % 获取通道数量
     % numChannels = length(EEG.chanlocs);
